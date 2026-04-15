@@ -14,6 +14,33 @@ then
     usage
 fi
 
+read -p "Inrodueix el nom complet " COMMENTS
+#demanam el nom de l'usuari
 read -p "Introdueix el nom d'usuari: " USER_NAME
+#demanam el password
+read -p "Introdueix el password: " PASSWORD
 
-echo "creant l'usuari ${USER_NAME}"
+#crearem l'usuari
+useradd -m -c "${COMMENTS}" ${USER_NAME} &> /dev/null
+#control de la darrera comanda
+echo ${?}
+
+if [[ ${?} -ne 0 ]]
+then
+    echo "Errada creant l'usuari"
+    exit 1
+fi
+
+#canvi de password
+echo "${USER}:${PASSWORD}" | chpasswd
+#comprovam si el canvi de password ha anat bé
+if [[ ${?} -ne 0 ]]
+then
+    echo "Errada canviant password"
+    exit 1
+fi
+
+#fer caducar el password
+oasswd -e ${USER_NAME}
+
+exit 0
